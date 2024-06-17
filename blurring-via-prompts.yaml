@@ -12,3 +12,4 @@ dependencies:
   - ultralytics
   - gradio
   - scipy
+  - torchvision
