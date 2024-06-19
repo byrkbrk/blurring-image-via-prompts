@@ -3,6 +3,7 @@ import torch
 from transformers import pipeline
 from ultralytics import SAM
 from PIL import Image, ImageFilter
+from torchvision import transforms
 
 
 
@@ -18,19 +19,53 @@ class BlurImage(object):
         self.owlvit = pipeline(model=owlvit_ckpt, task=owlvit_task, device=self.device)
         self.sam = SAM(model=sam_ckpt)
 
-    def predict_masks(self, image, prompts):
-        pass
+    def blur_image(self, image, text_prompts, labels=None, save=True):
+        """Returns blurred image based on given text prompt"""
+        aggregated_mask = self.get_aggregated_mask(image, text_prompts, labels)
+        blurred_image = self.blur_entire_image(image)
+        blurred_image[:, ~aggregated_mask] = transforms.functional.pil_to_tensor(image)[:, ~aggregated_mask]
+        blurred_image = transforms.functional.to_pil_image(blurred_image)
+        if save:
+            blurred_image.save("blurred_image.jpg")
+        return blurred_image
+
+    def get_aggregated_mask(self, image, text_prompts, labels=None):
+        """Returns aggregated mask for given image, text prompts, and labels"""
+        aggregated_mask = 0
+        for annotation in self.get_annotations(image, text_prompts, labels):
+            aggregated_mask += annotation["segmentation"].float()
+        return aggregated_mask > 0
+    
+    def get_annotations(self, image, text_prompts, labels=None):
+        """Returns annotations predicted by SAM"""
+        return self.annotate_sam_inference(*self.predict_masks(image, 
+                                                               self.predict_boxes(image, text_prompts),
+                                                               labels))
+
+    def predict_masks(self, image, box_prompts, labels=None):
+        """Returns predicted masks by SAM"""
+        if labels is None:
+            labels = [1]*len(box_prompts)
+        return self.sam(image, bboxes=box_prompts, labels=labels)
     
     def predict_boxes(self, image, prompts):
         """Returns bounding boxes for given image and prompts"""
         return [list(pred["box"].values()) for pred in self.owlvit(image, prompts)]
 
     def initialize_device(self, device):
-        pass
+        """Initializes device based on availability"""
+        if device is None:
+            if torch.cuda.is_available():
+                device = "cuda"
+            elif torch.backends.mps.is_available():
+                device = "mps"
+            else:
+                device = "cpu"
+        return torch.device(device)
 
     def blur_entire_image(self, image, radius=50):
         """Returns Gaussian-blurred image"""
-        return image.filter(ImageFilter.GaussianBlur(radius=radius))
+        return transforms.functional.pil_to_tensor(image.filter(ImageFilter.GaussianBlur(radius=radius)))
     
     def annotate_sam_inference(self, inference, area_threshold=0):
         """Returns list of annotation dicts
@@ -43,8 +78,6 @@ class BlurImage(object):
             annotation = {}
             annotation["id"] = i
             annotation["segmentation"] = inference.masks.data[i].cpu()==1
-            annotation["bbox"] = inference.boxes.data[i]
-            annotation["score"] = inference.boxes.conf[i]
             annotation["area"] = annotation["segmentation"].sum()
 
             if annotation["area"] >= area_threshold:
@@ -53,4 +86,10 @@ class BlurImage(object):
 
 
 if __name__ == "__main__":
-    blur_image = BlurImage()
+    image = Image.open("blurring-images/dogs.jpg")
+    image = image.resize((1024, 1024))
+    blur_image = BlurImage(device="cpu")
+    #annotations = blur_image.get_annotations(image, ["small nose"])
+    #print(annotations)
+    #print(blur_image.get_aggregated_mask(image, ["small nose"]).shape)
+    blur_image.blur_image(image, ["jacket"])
