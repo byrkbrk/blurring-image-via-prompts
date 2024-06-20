@@ -18,15 +18,23 @@ class BlurImage(object):
         self.device = self.initialize_device(device)
         self.owlvit = pipeline(model=owlvit_ckpt, task=owlvit_task, device=self.device)
         self.sam = SAM(model=sam_ckpt)
+        self.create_dirs(self.module_dir)
 
-    def blur(self, image, text_prompts, labels=None, save=True):
+    def blur(self, image, text_prompts, labels=None, save=True, size=None):
         """Returns blurred image based on given text prompt"""
+        if type(image) == str: 
+            image_name = image
+            image = self.read_image(self.module_dir, "images-to-blur", image, size)
+        else:
+            image_name = "noname"
+            if size: image = self.resize_image(image, size)
+
         aggregated_mask = self.get_aggregated_mask(image, text_prompts, labels)
         blurred_image = self.blur_entire_image(image)
         blurred_image[:, ~aggregated_mask] = transforms.functional.pil_to_tensor(image)[:, ~aggregated_mask]
         blurred_image = transforms.functional.to_pil_image(blurred_image)
         if save:
-            blurred_image.save("blurred_image.jpg")
+            blurred_image.save(os.path.join(self.module_dir, "blurred-images", os.path.splitext(image_name)[0] + "_blurred_image.jpg"))
         return blurred_image
 
     def get_aggregated_mask(self, image, text_prompts, labels=None):
@@ -83,13 +91,31 @@ class BlurImage(object):
             if annotation["area"] >= area_threshold:
                 annotations += [annotation]
         return annotations
-
+    
+    def read_image(self, root, base_folder, image_name, size=None):
+        """Returns the openned for given image name base folder, and root"""
+        image = Image.open(os.path.join(root, base_folder, image_name))
+        if size:
+            image = self.resize_image(image, size)
+        return image
+    
+    def resize_image(self, image, size):
+        """Returns resized image"""
+        return image.resize(size)
+    
+    def create_dirs(self, root):
+        """Creates required directories under the given root"""
+        dir_names = ["images-to-blur", "blurred-images"]
+        for dir_name in dir_names:
+            os.makedirs(os.path.join(root, dir_name), exist_ok=True)
+        
 
 if __name__ == "__main__":
-    image = Image.open("blurring-images/dogs.jpg")
+    image = Image.open("images-to-blur/dogs.jpg")
     image = image.resize((1024, 1024))
     blur_image = BlurImage(device="cpu")
     #annotations = blur_image.get_annotations(image, ["small nose"])
     #print(annotations)
     #print(blur_image.get_aggregated_mask(image, ["small nose"]).shape)
+    image = "dogs.jpg"
     blur_image.blur(image, ["jacket"])
