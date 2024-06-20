@@ -19,7 +19,7 @@ class BlurImage(object):
         self.owlvit = pipeline(model=owlvit_ckpt, task=owlvit_task, device=self.device)
         self.sam = SAM(model=sam_ckpt)
 
-    def blur_image(self, image, text_prompts, labels=None, save=True):
+    def blur(self, image, text_prompts, labels=None, save=True):
         """Returns blurred image based on given text prompt"""
         aggregated_mask = self.get_aggregated_mask(image, text_prompts, labels)
         blurred_image = self.blur_entire_image(image)
@@ -92,4 +92,4 @@ if __name__ == "__main__":
     #annotations = blur_image.get_annotations(image, ["small nose"])
     #print(annotations)
     #print(blur_image.get_aggregated_mask(image, ["small nose"]).shape)
-    blur_image.blur_image(image, ["jacket"])
+    blur_image.blur(image, ["jacket"])
