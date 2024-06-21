@@ -24,7 +24,7 @@ class BlurImage(object):
         """Returns blurred image based on given text prompt"""
         if type(image) == str: 
             image_name = image
-            image = self.read_image(self.module_dir, "images-to-blur", image, size)
+            image = self.read_image(self.module_dir, "images-to-blur", image_name, size)
         else:
             image_name = "noname"
             if size: image = self.resize_image(image, size)
