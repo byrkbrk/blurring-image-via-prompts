@@ -27,3 +27,55 @@ We implement a module that blurs objects (in an image) determined by the user (t
     ~~~
     conda activate blurring-via-prompts
     ~~~
+
+## Blurring Objects
+
+Check it out how to use:
+
+~~~
+python3 blur.py -h
+~~~
+
+Output:
+
+~~~
+Blurs image based on given text prompts
+
+positional arguments:
+  image_name            Name of the image file that be processed. Image file
+                        must be in `images-to-blur` folder
+  text_prompts          Text prompts for the objects that get blurred
+
+options:
+  -h, --help            show this help message and exit
+  --image_size IMAGE_SIZE [IMAGE_SIZE ...]
+                        Size (width, height) to which the image be
+                        transformed. Default: None
+  --device DEVICE       Device that be used during inference. Default: 'cpu'
+~~~
+
+### Example usage
+
+~~~
+python3 blur.py dogs.jpg "jacket"
+~~~
+
+The output image (see below, on the right) will be saved into `blurred-images` folder.
+
+<p align="center">
+  <img src="files-for-readme/dogs.jpg" width="45%" />
+  <img src="files-for-readme/dogs_blurred_image.jpg" width="45%" />
+</p>
+
+## Blurring via Gradio
+
+To run the gradio app on your local computer, execute
+
+~~~
+python3 app.py
+~~~
+Then, visit the url [http://127.0.0.1:7860](http://127.0.0.1:7860) to open the interface seen below.
+
+<p align="left">
+  <img src="files-for-readme/blur_image_gradio_ss.png" width="100%" />
+</p>
