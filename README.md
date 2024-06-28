@@ -81,3 +81,11 @@ Then, visit the url [http://127.0.0.1:7860](http://127.0.0.1:7860) to open the i
 <p align="left">
   <img src="files-for-readme/blur_image_gradio_ss.png" width="100%" />
 </p>
+
+### Example usage
+
+See the display below for an example usage of the module via Gradio for the image `hat_sunglasses.jpg` (foundable in the directory `images-to-blur`).
+
+<p align="left">
+  <img src="files-for-readme/hat_sunglasses_ss.png" width="100%" />
+</p>
