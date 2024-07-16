@@ -14,7 +14,7 @@ def parse_arguments():
                         help="Intensity of the blur that be applied. Default: 50")
     parser.add_argument("--image_size", nargs="+", type=int, default=None,
                         help="Size (width, height) to which the image be transformed. Default: None")
-    parser.add_argument("--device", type=str, default="cpu", help="Device that be used during inference. Default: 'cpu'")
+    parser.add_argument("--device", type=str, default=None, help="Device that be used during inference. Default: None")
     return parser.parse_args()
 
 
