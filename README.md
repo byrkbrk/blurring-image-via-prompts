@@ -50,10 +50,12 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
+  --blur_intensity BLUR_INTENSITY
+                        Intensity of the blur that be applied. Default: 50
   --image_size IMAGE_SIZE [IMAGE_SIZE ...]
                         Size (width, height) to which the image be
                         transformed. Default: None
-  --device DEVICE       Device that be used during inference. Default: 'cpu'
+  --device DEVICE       Device that be used during inference. Default: None
 ~~~
 
 ### Example usage
@@ -79,7 +81,7 @@ python3 app.py
 Then, visit the url [http://127.0.0.1:7860](http://127.0.0.1:7860) to open the interface seen below.
 
 <p align="left">
-  <img src="files-for-readme/blur_image_gradio_ss.png" width="100%" />
+  <img src="files-for-readme/blurring_gradio_ss.png" width="100%" />
 </p>
 
 ### Example usage
@@ -87,5 +89,5 @@ Then, visit the url [http://127.0.0.1:7860](http://127.0.0.1:7860) to open the i
 See the display below for an example usage of the module via Gradio for the image `hat_sunglasses.jpg` (foundable in the directory `images-to-blur`).
 
 <p align="left">
-  <img src="files-for-readme/hat_sunglasses_ss.png" width="100%" />
+  <img src="files-for-readme/blurring_gradio_ss_example_usage.png" width="100%" />
 </p>
