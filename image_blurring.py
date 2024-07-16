@@ -20,7 +20,7 @@ class BlurImage(object):
         self.sam = SAM(model=sam_ckpt)
         self.create_dirs(self.module_dir)
 
-    def blur(self, image, text_prompts, labels=None, save=True, size=None):
+    def blur(self, image, text_prompts, blur_intensity=50, labels=None, save=True, size=None):
         """Returns blurred image based on given text prompt"""
         if type(image) == str: 
             image_name = image
@@ -30,7 +30,7 @@ class BlurImage(object):
             if size: image = self.resize_image(image, size)
 
         aggregated_mask = self.get_aggregated_mask(image, text_prompts, labels)
-        blurred_image = self.blur_entire_image(image)
+        blurred_image = self.blur_entire_image(image, radius=blur_intensity)
         blurred_image[:, ~aggregated_mask] = transforms.functional.pil_to_tensor(image)[:, ~aggregated_mask]
         blurred_image = transforms.functional.to_pil_image(blurred_image)
         if save:
