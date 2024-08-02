@@ -1,3 +1,4 @@
+import os
 import gradio as gr
 from image_blurring import BlurImage
 
@@ -11,6 +12,16 @@ if __name__ == "__main__":
                 gr.Textbox(lines=3, placeholder="jacket\ndog head\netc..."),
                 gr.Slider(minimum=0, maximum=400, step=10, value=50, label="Blur intensity")],
         outputs=gr.Image(type="pil"),
-        title="Blur Objects by Prompts"
+        title="Blur Objects by Prompts",
+        examples=[
+            [os.path.join(os.path.dirname(__file__), 
+                          "images-to-blur", 
+                          "dogs.jpg"),
+             "jacket\ndog head"],
+             [os.path.join(os.path.dirname(__file__), 
+                          "images-to-blur", 
+                          "hat_sunglasses.jpg"),
+              "hat\nsunglasses"]             
+        ]
     )
     gr_interface.launch()
