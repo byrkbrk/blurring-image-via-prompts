@@ -13,3 +13,5 @@ dependencies:
   - gradio
   - scipy
   - torchvision
+  - fastapi
+  - uvicorn
