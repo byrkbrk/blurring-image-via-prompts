@@ -13,11 +13,9 @@ def root():
 
 @app.post("/blur-image")
 async def blur(file: UploadFile = File(...), 
-                     prompt: str = Form(...),
-                     blur_intensity: int = Form(...)):
-    #print(file, prompt, blur_intensity)
+               prompt: str = Form(...),
+               blur_intensity: int = Form(...)):
     prompt = prompt.split(",")
-    print(prompt)
     blur_image.blur(Image.open(file.file), 
                     prompt,
                     blur_intensity,
